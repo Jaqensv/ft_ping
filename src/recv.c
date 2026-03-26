@@ -31,8 +31,6 @@ ssize_t recv_packet(t_ping *ctx, char *buffer)
 
         icmp_offset = parse_ip(buffer);
 
-        
-        //printf("proto=%d ttl=%d type=%d id=%u seq=%u\n", ip->protocol, ip->ttl, icmp->type, ntohs(icmp->un.echo.id), ntohs(icmp->un.echo.sequence));
         if (icmp_offset == PACKET_IGNORE)
         continue;
     
@@ -46,11 +44,12 @@ ssize_t recv_packet(t_ping *ctx, char *buffer)
             continue;
         break;
     }
-
+    
     double rtt = calculate_rtt(buffer, icmp_offset, recv_ts);
     struct iphdr *ip = (struct iphdr *)buffer;
     struct icmphdr *icmp = (struct icmphdr *)(buffer + icmp_offset);
-    display_stats(bytes, ip->saddr, icmp->un.echo.sequence, ip->ttl, rtt);
+    display_loop(bytes, ip->saddr, icmp->un.echo.sequence, ip->ttl, rtt);
+    ctx->packets_received++;
 
     return bytes;
 }

@@ -9,6 +9,8 @@ int init_connection(t_ping *ctx, const char *host)
     ctx->sockfd = -1; // 0 existe, donc mettre -1 par sécurité
     ctx->pid = getpid();
     ctx->id = (uint16_t)getpid();
+    ctx->packets_sent = 0;
+    ctx->packets_received = 0;
 
     int ret = get_ip(host, &ctx->addr);
     if (ret != 0)

@@ -11,12 +11,15 @@
 #include <unistd.h>                 // close() // getpid()
 #include <netinet/ip_icmp.h>        // icmphdr
 #include <netinet/ip.h>             // iphdr
+#include <signal.h>                 // sig_atomic
 
 #define ICMP_PAYLOAD_SIZE 56
 #define BUFFER_SIZE 1024
 #define PACKET_OK 1
 #define PACKET_IGNORE 0
 #define PACKET_ERROR -1
+
+extern volatile sig_atomic_t g_running;
 
 typedef struct s_ping
 {
@@ -25,6 +28,8 @@ typedef struct s_ping
     uint16_t id;
     uint16_t seq;
     double rtt;
+    uint32_t packets_sent;
+    uint32_t packets_received;
     struct sockaddr_in addr;
 } t_ping;
 
@@ -34,7 +39,8 @@ int init_connection(t_ping *ctx, const char *host);
 /* -utils- */
 int perror_ret(const char *msg);
 int gai_ret(const char *msg, int errcode);
-void display_stats(ssize_t bytes, uint32_t saddr, uint16_t seq, uint8_t ttl, double rtt);
+void display_loop(ssize_t bytes, uint32_t saddr, uint16_t seq, uint8_t ttl, double rtt);
+void display_statistics(t_ping *ctx, const char *host);
 
 /* -packet */
 ssize_t send_packet(t_ping *ctx, const char *buffer);

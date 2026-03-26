@@ -17,6 +17,8 @@ ssize_t send_packet(t_ping *ctx, const char *buffer)
     if (bytes == -1)
         return -1;
 
+    ctx->packets_sent++;
+
     return bytes;
 }
 
