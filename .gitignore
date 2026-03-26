@@ -1,0 +1,24 @@
+# Fichiers compilés
+*.o
+*.a
+*.out
+
+# Binaire final
+ft_ping
+
+# Debug
+*.dSYM/
+*.log
+
+# Fichiers temporaires
+*.swp
+*.tmp
+
+# VS Code
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Autre
+notes.txt
