@@ -2,6 +2,7 @@ NAME = ft_ping
 
 CC = cc
 CFLAGS = -g -Wall -Wextra -Werror
+LDFLAGS = -lm
 
 SRC = src/main.c \
 	  src/init.c \
@@ -16,7 +17,7 @@ OBJ = $(SRC:.c=.o)
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

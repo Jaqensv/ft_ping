@@ -15,17 +15,18 @@ int init_connection(t_ping *ctx, const char *host)
     ctx->max_rtt = 0;
     ctx->rtt_count = 0;
     ctx->capacity = 8;
-    ctx->rtt_tab = malloc(sizeof(double) * ctx->capacity);
-    if (!ctx->rtt_tab)
-        return perror_ret("rtt_tab");
-
+    
     int ret = get_ip(host, &ctx->addr);
     if (ret != 0)
-        return gai_ret("getaddrinfo", ret);
+    return gai_ret("getaddrinfo", ret);
 
     ctx->sockfd = create_socket();
     if (ctx->sockfd == -1)
-        return perror_ret("socket");
+    return perror_ret("socket");
+
+    ctx->rtt_tab = malloc(sizeof(double) * ctx->capacity);
+    if (!ctx->rtt_tab)
+        return perror_ret("rtt_tab");
 
     return 0;
 }

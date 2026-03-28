@@ -22,15 +22,26 @@ double calculate_rtt(t_ping *ctx, const char *buffer, int icmp_offset, struct ti
     return rtt;
 }
 
+
 void calculate_avg_rtt(t_ping *ctx)
 {
-    double stacked_rtt = 0;
-
+    ctx->rtt_sum = 0;
+    ctx->rtt_sum_sq = 0;
+    
     for (size_t i = 0; i < ctx->rtt_count; i++)
     {
-        stacked_rtt += ctx->rtt_tab[i];
+        ctx->rtt_sum += ctx->rtt_tab[i];
+        ctx->rtt_sum_sq += ctx->rtt_tab[i] * ctx->rtt_tab[i];
     }
-    ctx->avg_rtt = stacked_rtt / ctx->rtt_count;
+    ctx->avg_rtt = ctx->rtt_sum / ctx->rtt_count;
+}
+
+void calculate_stddev(t_ping *ctx)
+{
+    double variance = (ctx->rtt_sum_sq / ctx->rtt_count) - (ctx->avg_rtt * ctx->avg_rtt);
+    if (variance < 0)
+        variance = 0;
+    ctx->stddev = sqrt(variance);
 }
 
 static void update_rtt_stats(t_ping *ctx, double rtt)
@@ -51,5 +62,3 @@ static void update_rtt_stats(t_ping *ctx, double rtt)
     ctx->rtt_tab[ctx->rtt_count] = rtt;
     ctx->rtt_count++;
 }
-
-

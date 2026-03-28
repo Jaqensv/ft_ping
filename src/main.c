@@ -20,24 +20,24 @@ int handle_connection(t_ping *ctx, const char *host)
     {    
         if (send_packet(ctx, send_buffer) == -1)
         {
-            display_statistics(ctx, host, 0);
+            display_statistics(ctx, host, false);
             free_resources(ctx, send_buffer);
             return perror_ret("sendto");
         }
         if (recv_packet(ctx, recv_buffer) == PACKET_ERROR)
         {
-            display_statistics(ctx, host, 0);
+            display_statistics(ctx, host, false);
             free_resources(ctx, send_buffer);
             return perror_ret("recvfrom");
         }
-
         ctx->seq++;
         usleep(1000000);
     }
     if (ctx->rtt_count > 0)
     {
         calculate_avg_rtt(ctx);
-        display_statistics(ctx, host, 1);
+        calculate_stddev(ctx);
+        display_statistics(ctx, host, true);
     }
 
     free_resources(ctx, send_buffer);

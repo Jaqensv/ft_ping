@@ -12,6 +12,8 @@
 #include <netinet/ip_icmp.h>        // icmphdr
 #include <netinet/ip.h>             // iphdr
 #include <signal.h>                 // sig_atomic
+#include <math.h>                   // sqrt()
+#include <stdbool.h>
 
 #define ICMP_PAYLOAD_SIZE 56
 #define BUFFER_SIZE 1024
@@ -31,9 +33,13 @@ typedef struct s_ping
     double min_rtt;
     double max_rtt;
     double avg_rtt;
+    double avg_rtt_sq;
+    double rtt_sum;
+    double rtt_sum_sq;
     size_t capacity;
     double *rtt_tab;
     size_t rtt_count;
+    double stddev;
     uint32_t packets_sent;
     uint32_t packets_received;
     struct sockaddr_in addr;
@@ -46,7 +52,7 @@ int init_connection(t_ping *ctx, const char *host);
 int perror_ret(const char *msg);
 int gai_ret(const char *msg, int errcode);
 void display_loop(ssize_t bytes, uint32_t saddr, uint16_t seq, uint8_t ttl, double rtt);
-void display_statistics(t_ping *ctx, const char *host);
+void display_statistics(t_ping *ctx, const char *host, bool packet_received);
 void free_resources(t_ping *ctx, char *buffer);
 
 /* -packet */
@@ -61,3 +67,4 @@ uint16_t calculate_checksum(const char *buffer, uint16_t len);
 /* -rtt- */
 double calculate_rtt(t_ping *ctx, const char *buffer, int icmp_offset, struct timespec recv_ts);
 void calculate_avg_rtt(t_ping *ctx);
+void calculate_stddev(t_ping *ctx);
