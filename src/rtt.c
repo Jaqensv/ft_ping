@@ -27,20 +27,34 @@ void calculate_avg_rtt(t_ping *ctx)
 {
     ctx->rtt_sum = 0;
     ctx->rtt_sum_sq = 0;
+
+    if (ctx->rtt_count == 0)
+    {
+        ctx->avg_rtt = 0;
+        return;
+    }
     
     for (size_t i = 0; i < ctx->rtt_count; i++)
     {
         ctx->rtt_sum += ctx->rtt_tab[i];
         ctx->rtt_sum_sq += ctx->rtt_tab[i] * ctx->rtt_tab[i];
     }
+
     ctx->avg_rtt = ctx->rtt_sum / ctx->rtt_count;
 }
 
 void calculate_stddev(t_ping *ctx)
 {
+    if (ctx->rtt_count == 0)
+    {
+        ctx->stddev = 0;
+        return;
+    }
+
     double variance = (ctx->rtt_sum_sq / ctx->rtt_count) - (ctx->avg_rtt * ctx->avg_rtt);
     if (variance < 0)
         variance = 0;
+
     ctx->stddev = sqrt(variance);
 }
 

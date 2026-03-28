@@ -14,6 +14,7 @@
 #include <signal.h>                 // sig_atomic
 #include <math.h>                   // sqrt()
 #include <stdbool.h>
+#include <float.h>                  // DBL_MAX
 
 #define ICMP_PAYLOAD_SIZE 56
 #define BUFFER_SIZE 1024
@@ -33,7 +34,6 @@ typedef struct s_ping
     double min_rtt;
     double max_rtt;
     double avg_rtt;
-    double avg_rtt_sq;
     double rtt_sum;
     double rtt_sum_sq;
     size_t capacity;
