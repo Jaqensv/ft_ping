@@ -39,11 +39,4 @@ static void build_icmp_packet(t_ping *ctx, const char *buffer)
     memcpy(payload, &ts, sizeof(ts));
 
     icmp->checksum = htons(calculate_checksum(buffer, sizeof(struct icmphdr) + ICMP_PAYLOAD_SIZE));
-
-    // printf("build: type=%d code=%d id=%u seq=%u checksum=0x%04x\n",
-    //    icmp->type,
-    //    icmp->code,
-    //    ntohs(icmp->un.echo.id),
-    //    ntohs(icmp->un.echo.sequence),
-    //    ntohs(icmp->checksum));
 }

@@ -11,25 +11,36 @@ void handle_sigint(int sig)
 int handle_connection(t_ping *ctx, const char *host)
 {
     char *send_buffer = malloc(sizeof(struct icmphdr) + ICMP_PAYLOAD_SIZE);
-    memset(send_buffer, 0, sizeof(struct icmphdr) + ICMP_PAYLOAD_SIZE);
     if (!send_buffer)
-        return (perror_ret("buffer"));
+        return (perror_ret("send_buffer"));
+    memset(send_buffer, 0, sizeof(struct icmphdr) + ICMP_PAYLOAD_SIZE);
     char recv_buffer[BUFFER_SIZE];
 
     while (g_running)
     {    
         if (send_packet(ctx, send_buffer) == -1)
+        {
+            display_statistics(ctx, host, 0);
+            free_resources(ctx, send_buffer);
             return perror_ret("sendto");
+        }
         if (recv_packet(ctx, recv_buffer) == PACKET_ERROR)
+        {
+            display_statistics(ctx, host, 0);
+            free_resources(ctx, send_buffer);
             return perror_ret("recvfrom");
+        }
 
         ctx->seq++;
         usleep(1000000);
     }
+    if (ctx->rtt_count > 0)
+    {
+        calculate_avg_rtt(ctx);
+        display_statistics(ctx, host, 1);
+    }
 
-    display_statistics(ctx, host);
-    free(send_buffer);
-    close(ctx->sockfd);
+    free_resources(ctx, send_buffer);
 
     return 0;
 }

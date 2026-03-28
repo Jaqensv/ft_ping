@@ -1,8 +1,7 @@
 #include "../include/ft_ping.h"
 
-static int  parse_ip(const char *buffer);
-static int  parse_icmp(t_ping *ctx, const char *buffer, int icmp_offset);
-static double calculate_rtt(const char *buffer, int icmp_offset, struct timespec recv_ts);
+static int parse_ip(const char *buffer);
+static int parse_icmp(t_ping *ctx, const char *buffer, int icmp_offset);
 
 ssize_t recv_packet(t_ping *ctx, char *buffer)
 {
@@ -45,7 +44,7 @@ ssize_t recv_packet(t_ping *ctx, char *buffer)
         break;
     }
     
-    double rtt = calculate_rtt(buffer, icmp_offset, recv_ts);
+    double rtt = calculate_rtt(ctx, buffer, icmp_offset, recv_ts);
     struct iphdr *ip = (struct iphdr *)buffer;
     struct icmphdr *icmp = (struct icmphdr *)(buffer + icmp_offset);
     display_loop(bytes, ip->saddr, icmp->un.echo.sequence, ip->ttl, rtt);
@@ -84,21 +83,4 @@ static int parse_icmp(t_ping *ctx, const char *buffer, int icmp_offset)
     if (seq != ctx->seq)
         return PACKET_IGNORE;
     return PACKET_OK;
-}
-
-static double calculate_rtt(const char *buffer, int icmp_offset, struct timespec recv_ts)
-{
-    const struct icmphdr *icmp = (const struct icmphdr *)(buffer + icmp_offset);
-    const struct timespec *sent_ts = (const struct timespec *)((const char *)icmp + sizeof(struct icmphdr));
-
-    time_t sec = recv_ts.tv_sec - sent_ts->tv_sec;
-    long nsec = recv_ts.tv_nsec - sent_ts->tv_nsec;
-
-    if (nsec < 0)
-    {
-        sec--;
-        nsec += 1000000000L;
-    }
-
-    return sec * 1000.0 + nsec / 1000000.0;
 }

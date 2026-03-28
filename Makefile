@@ -8,6 +8,7 @@ SRC = src/main.c \
 	  src/packet.c \
 	  src/checksum.c \
 	  src/recv.c \
+	  src/rtt.c \
       src/utils.c
 
 OBJ = $(SRC:.c=.o)

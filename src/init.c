@@ -11,6 +11,13 @@ int init_connection(t_ping *ctx, const char *host)
     ctx->id = (uint16_t)getpid();
     ctx->packets_sent = 0;
     ctx->packets_received = 0;
+    ctx->min_rtt = 0;
+    ctx->max_rtt = 0;
+    ctx->rtt_count = 0;
+    ctx->capacity = 8;
+    ctx->rtt_tab = malloc(sizeof(double) * ctx->capacity);
+    if (!ctx->rtt_tab)
+        return perror_ret("rtt_tab");
 
     int ret = get_ip(host, &ctx->addr);
     if (ret != 0)
