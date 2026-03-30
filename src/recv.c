@@ -13,7 +13,7 @@ ssize_t recv_packet(t_ping *ctx, char *buffer)
 
     while (1)
     {
-        bytes = recvfrom(ctx->sockfd,
+        bytes = recvfrom(ctx->sys.sockfd,
                          buffer,
                          BUFFER_SIZE,
                          0,
@@ -48,7 +48,7 @@ ssize_t recv_packet(t_ping *ctx, char *buffer)
     struct iphdr *ip = (struct iphdr *)buffer;
     struct icmphdr *icmp = (struct icmphdr *)(buffer + icmp_offset);
     display_loop(bytes, ip->saddr, icmp->un.echo.sequence, ip->ttl, rtt);
-    ctx->packets_received++;
+    ctx->stats.packets_received++;
 
     return bytes;
 }
@@ -78,9 +78,9 @@ static int parse_icmp(t_ping *ctx, const char *buffer, int icmp_offset)
 
     if (icmp->type != ICMP_ECHOREPLY)
         return PACKET_IGNORE;
-    if (id != ctx->id)
+    if (id != ctx->sys.id)
         return PACKET_IGNORE;
-    if (seq != ctx->seq)
+    if (seq != ctx->sys.seq)
         return PACKET_IGNORE;
     return PACKET_OK;
 }

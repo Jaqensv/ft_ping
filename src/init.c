@@ -5,33 +5,36 @@ static int get_ip(const char *host, struct sockaddr_in *addr_in);
 
 int init_connection(t_ping *ctx, const char *host)
 {
-    ctx->seq = 0;
-    ctx->sockfd = -1; // 0 existe, donc mettre -1 par sécurité
-    ctx->pid = getpid();
-    ctx->id = (uint16_t)getpid();
-    ctx->packets_sent = 0;
-    ctx->packets_received = 0;
-    ctx->min_rtt = DBL_MAX;
-    ctx->max_rtt = 0;
-    ctx->rtt_count = 0;
-    ctx->capacity = 8;
-    ctx->rtt_sum = 0;
-    ctx->rtt_sum_sq = 0;
-    ctx->avg_rtt = 0;
-    ctx->stddev = 0;
-    ctx->rtt = 0;
-    ctx->rtt_tab = NULL;
+    ctx->sys.sockfd = -1;
+    ctx->sys.pid = getpid();
+    ctx->sys.id = (uint16_t)getpid();
+    ctx->sys.seq = 0;
 
-    int ret = get_ip(host, &ctx->addr);
+    ctx->stats.rtt = 0;
+    ctx->stats.min_rtt = DBL_MAX;
+    ctx->stats.max_rtt = 0;
+    ctx->stats.avg_rtt = 0;
+    ctx->stats.rtt_sum = 0;
+    ctx->stats.rtt_sum_sq = 0;
+    ctx->stats.stddev = 0;
+
+    ctx->stats.packets_sent = 0;
+    ctx->stats.packets_received = 0;
+
+    ctx->stats.rtt_tab = NULL;
+    ctx->stats.rtt_count = 0;
+    ctx->stats.capacity = 8;
+
+    int ret = get_ip(host, &ctx->sys.addr);
     if (ret != 0)
         return gai_ret("getaddrinfo", ret);
 
-    ctx->sockfd = create_socket();
-    if (ctx->sockfd == -1)
+    ctx->sys.sockfd = create_socket();
+    if (ctx->sys.sockfd == -1)
         return perror_ret("socket");
 
-    ctx->rtt_tab = malloc(sizeof(double) * ctx->capacity);
-    if (!ctx->rtt_tab)
+    ctx->stats.rtt_tab = malloc(sizeof(double) * ctx->stats.capacity);
+    if (!ctx->stats.rtt_tab)
         return perror_ret("rtt_tab");
 
     return 0;
@@ -48,20 +51,18 @@ static int create_socket()
 
 static int get_ip(const char *host, struct sockaddr_in *addr_in)
 {
-    struct addrinfo hints;                 // ce que tu demandes
-    struct addrinfo *res = NULL;           // ce que tu obtiens
+    struct addrinfo hints;
+    struct addrinfo *res = NULL;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_RAW;
 
     int ret = getaddrinfo(host, NULL, &hints, &res);
-    // ret = return value, getaddrinfo envoie 0 ou code erreur.
     if (ret != 0)
         return -1;
 
     *addr_in = *(struct sockaddr_in *)res->ai_addr;
-    // le type de cast dépend de ai_family. sockaddr_in veut dire "c'est une ipv4"
 
     freeaddrinfo(res);
     return ret;

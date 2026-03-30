@@ -25,54 +25,54 @@ double calculate_rtt(t_ping *ctx, const char *buffer, int icmp_offset, struct ti
 
 void calculate_avg_rtt(t_ping *ctx)
 {
-    ctx->rtt_sum = 0;
-    ctx->rtt_sum_sq = 0;
+    ctx->stats.rtt_sum = 0;
+    ctx->stats.rtt_sum_sq = 0;
 
-    if (ctx->rtt_count == 0)
+    if (ctx->stats.rtt_count == 0)
     {
-        ctx->avg_rtt = 0;
+        ctx->stats.avg_rtt = 0;
         return;
     }
     
-    for (size_t i = 0; i < ctx->rtt_count; i++)
+    for (size_t i = 0; i < ctx->stats.rtt_count; i++)
     {
-        ctx->rtt_sum += ctx->rtt_tab[i];
-        ctx->rtt_sum_sq += ctx->rtt_tab[i] * ctx->rtt_tab[i];
+        ctx->stats.rtt_sum += ctx->stats.rtt_tab[i];
+        ctx->stats.rtt_sum_sq += ctx->stats.rtt_tab[i] * ctx->stats.rtt_tab[i];
     }
 
-    ctx->avg_rtt = ctx->rtt_sum / ctx->rtt_count;
+    ctx->stats.avg_rtt = ctx->stats.rtt_sum / ctx->stats.rtt_count;
 }
 
 void calculate_stddev(t_ping *ctx)
 {
-    if (ctx->rtt_count == 0)
+    if (ctx->stats.rtt_count == 0)
     {
-        ctx->stddev = 0;
+        ctx->stats.stddev = 0;
         return;
     }
 
-    double variance = (ctx->rtt_sum_sq / ctx->rtt_count) - (ctx->avg_rtt * ctx->avg_rtt);
+    double variance = (ctx->stats.rtt_sum_sq / ctx->stats.rtt_count) - (ctx->stats.avg_rtt * ctx->stats.avg_rtt);
     if (variance < 0)
         variance = 0;
 
-    ctx->stddev = sqrt(variance);
+    ctx->stats.stddev = sqrt(variance);
 }
 
 static void update_rtt_stats(t_ping *ctx, double rtt)
 {
-    if (ctx->rtt_count >= ctx->capacity)
+    if (ctx->stats.rtt_count >= ctx->stats.capacity)
     {
-        ctx->capacity *= 2;
-        double *tmp = realloc(ctx->rtt_tab, sizeof(double) * ctx->capacity);
+        ctx->stats.capacity *= 2;
+        double *tmp = realloc(ctx->stats.rtt_tab, sizeof(double) * ctx->stats.capacity);
         if (!tmp)
             return;
-        ctx->rtt_tab = tmp;
+        ctx->stats.rtt_tab = tmp;
     }
-    if (rtt < ctx->min_rtt || ctx->min_rtt == 0)
-        ctx->min_rtt = rtt;
-    if (rtt > ctx->max_rtt || ctx->max_rtt == 0)
-        ctx->max_rtt = rtt;
+    if (rtt < ctx->stats.min_rtt || ctx->stats.min_rtt == 0)
+        ctx->stats.min_rtt = rtt;
+    if (rtt > ctx->stats.max_rtt || ctx->stats.max_rtt == 0)
+        ctx->stats.max_rtt = rtt;
 
-    ctx->rtt_tab[ctx->rtt_count] = rtt;
-    ctx->rtt_count++;
+    ctx->stats.rtt_tab[ctx->stats.rtt_count] = rtt;
+    ctx->stats.rtt_count++;
 }

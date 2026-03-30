@@ -30,10 +30,10 @@ int handle_connection(t_ping *ctx, const char *host)
             free_resources(ctx, send_buffer);
             return perror_ret("recvfrom");
         }
-        ctx->seq++;
+        ctx->sys.seq++;
         usleep(1000000);
     }
-    if (ctx->rtt_count > 0)
+    if (ctx->stats.rtt_count > 0)
     {
         calculate_avg_rtt(ctx);
         calculate_stddev(ctx);

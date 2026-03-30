@@ -22,19 +22,16 @@ void display_loop(ssize_t bytes, uint32_t saddr, uint16_t seq, uint8_t ttl, doub
 
 void display_statistics(t_ping *ctx, const char *host, bool packet_received)
 {
-    double loss_percent = ((ctx->packets_sent - ctx->packets_received) * 100.0) / ctx->packets_sent;
+    double loss_percent = ((ctx->stats.packets_sent - ctx->stats.packets_received) * 100.0) / ctx->stats.packets_sent;
     printf("\n--- %s ping statistics ---\n", host);
-    printf("%u packets transmitted, %u packets received, %.1f%% packet loss\n", ctx->packets_sent, ctx->packets_received, loss_percent);
+    printf("%u packets transmitted, %u packets received, %.1f%% packet loss\n", ctx->stats.packets_sent, ctx->stats.packets_received, loss_percent);
     if (packet_received == true)
-        printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", ctx->min_rtt, ctx->max_rtt, ctx->avg_rtt, ctx->stddev);
-    //--- 8.8.8.8 ping statistics ---
-    // 3 packets transmitted, 3 packets received, 0.0% packet loss
-    // round-trip min/avg/max/stddev = 9.270/10.043/11.285/0.887 ms
+        printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", ctx->stats.min_rtt, ctx->stats.max_rtt, ctx->stats.avg_rtt, ctx->stats.stddev);
 }
 
 void free_resources(t_ping *ctx, char *buffer)
 {
     free(buffer);
-    free(ctx->rtt_tab);
-    close(ctx->sockfd);
+    free(ctx->stats.rtt_tab);
+    close(ctx->sys.sockfd);
 }

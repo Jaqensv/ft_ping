@@ -24,25 +24,39 @@
 
 extern volatile sig_atomic_t g_running;
 
-typedef struct s_ping
+typedef struct s_ping_stats
 {
-    int sockfd;
-    pid_t pid;
-    uint16_t id;
-    uint16_t seq;
     double rtt;
     double min_rtt;
     double max_rtt;
     double avg_rtt;
     double rtt_sum;
     double rtt_sum_sq;
-    size_t capacity;
-    double *rtt_tab;
-    size_t rtt_count;
     double stddev;
+
     uint32_t packets_sent;
     uint32_t packets_received;
+
+    double *rtt_tab;
+    size_t rtt_count;
+    size_t capacity;
+} t_ping_stats;
+
+typedef struct s_ping_system
+{
+    int sockfd;
+    pid_t pid;
+
+    uint16_t id;
+    uint16_t seq;
+
     struct sockaddr_in addr;
+} t_ping_system;
+
+typedef struct s_ping
+{
+    t_ping_system sys;
+    t_ping_stats stats;
 } t_ping;
 
 /* -init- */
