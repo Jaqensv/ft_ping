@@ -12,7 +12,7 @@ int gai_ret(const char *msg, int errcode)
     return -1;
 }
 
-void display_loop(ssize_t bytes, uint32_t saddr, uint16_t seq, uint8_t ttl, double rtt)
+void display_packet(ssize_t bytes, uint32_t saddr, uint16_t seq, uint8_t ttl, double rtt)
 {
     char ip_str[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &saddr, ip_str, sizeof(ip_str));

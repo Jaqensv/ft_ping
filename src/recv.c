@@ -51,7 +51,7 @@ ssize_t recv_packet(t_ping *ctx, char *buffer)
     double rtt = calculate_rtt(ctx, buffer, icmp_offset, recv_ts);
     struct iphdr *ip = (struct iphdr *)buffer;
     struct icmphdr *icmp = (struct icmphdr *)(buffer + icmp_offset);
-    display_loop(bytes, ip->saddr, icmp->un.echo.sequence, ip->ttl, rtt);
+    display_packet(bytes, ip->saddr, icmp->un.echo.sequence, ip->ttl, rtt);
     ctx->stats.packets_received++;
 
     return bytes;

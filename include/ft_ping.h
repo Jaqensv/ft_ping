@@ -67,7 +67,7 @@ int init_connection(t_ping *ctx, const char *host);
 /* -utils- */
 int perror_ret(const char *msg);
 int gai_ret(const char *msg, int errcode);
-void display_loop(ssize_t bytes, uint32_t saddr, uint16_t seq, uint8_t ttl, double rtt);
+void display_packet(ssize_t bytes, uint32_t saddr, uint16_t seq, uint8_t ttl, double rtt);
 void display_statistics(t_ping *ctx, const char *host, bool packet_received);
 void free_resources(t_ping *ctx, char *buffer);
 
