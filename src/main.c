@@ -18,17 +18,28 @@ int handle_connection(t_ping *ctx, const char *host)
 
     while (g_running)
     {    
+        int status;
+    
         if (send_packet(ctx, send_buffer) == -1)
         {
             display_statistics(ctx, host, false);
             free_resources(ctx, send_buffer);
             return perror_ret("sendto");
         }
-        if (recv_packet(ctx, recv_buffer) == PACKET_ERROR)
+
+        status = recv_packet(ctx, recv_buffer);
+        if (status == PACKET_ERROR)
         {
             display_statistics(ctx, host, false);
             free_resources(ctx, send_buffer);
-            return perror_ret("recvfrom");
+            return (perror_ret("recvfrom"));
+        }
+        if (status == PACKET_TIMEOUT)
+        {
+            printf("Request timeout for icmp_seq=%u\n", ctx->sys.seq);
+            ctx->sys.seq++;
+            usleep(1000000);
+            continue;
         }
         ctx->sys.seq++;
         usleep(1000000);

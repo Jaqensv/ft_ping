@@ -15,9 +15,11 @@
 #include <math.h>                   // sqrt()
 #include <stdbool.h>
 #include <float.h>                  // DBL_MAX
+#include <sys/select.h>             // select()
 
 #define ICMP_PAYLOAD_SIZE 56
 #define BUFFER_SIZE 1024
+#define PACKET_TIMEOUT 2
 #define PACKET_OK 1
 #define PACKET_IGNORE 0
 #define PACKET_ERROR -1

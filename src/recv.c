@@ -2,6 +2,7 @@
 
 static int parse_ip(const char *buffer);
 static int parse_icmp(t_ping *ctx, const char *buffer, int icmp_offset);
+static int wait_for_packet(t_ping *ctx);
 
 ssize_t recv_packet(t_ping *ctx, char *buffer)
 {
@@ -13,6 +14,9 @@ ssize_t recv_packet(t_ping *ctx, char *buffer)
 
     while (1)
     {
+        int status = wait_for_packet(ctx);
+        if (status != PACKET_OK)
+            return (status);
         bytes = recvfrom(ctx->sys.sockfd,
                          buffer,
                          BUFFER_SIZE,
@@ -82,5 +86,30 @@ static int parse_icmp(t_ping *ctx, const char *buffer, int icmp_offset)
         return PACKET_IGNORE;
     if (seq != ctx->sys.seq)
         return PACKET_IGNORE;
+    return PACKET_OK;
+}
+
+static int wait_for_packet(t_ping *ctx)
+{
+    fd_set readfds;
+    struct timeval timeout;
+
+    FD_ZERO(&readfds);
+    FD_SET(ctx->sys.sockfd, &readfds);
+
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+
+    int ready = select(
+                ctx->sys.sockfd + 1,
+                &readfds,
+                NULL,
+                NULL,
+                &timeout
+    );
+    if (ready == -1)
+        return PACKET_ERROR;
+    if (ready == 0)
+        return PACKET_TIMEOUT;
     return PACKET_OK;
 }
